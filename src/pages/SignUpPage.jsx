@@ -9,7 +9,7 @@ const SignUpPage = () => {
 
   const onSignUpClicked = (e) => {
     e.preventDefault();
-    alert("Sign up not implemented yet");
+    alert("Sign up not implemented yet!!");
   };
 
   return (
