@@ -1,7 +1,30 @@
 import { PROJECTS } from "../constants";
 import { motion } from "framer-motion";
+import { useState } from "react";
+import { GoogleLogin } from "@react-oauth/google";
 
 const Projects = () => {
+  const [showLogin, setShowLogin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [pendingLink, setPendingLink] = useState(null);
+
+  const handleProjectClick = (e, link) => {
+    if (!isLoggedIn) {
+      e.preventDefault();
+      setPendingLink(link);
+      setShowLogin(true);
+    }
+  };
+
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+    setShowLogin(false);
+    if (pendingLink) {
+      window.open(pendingLink, "_blank");
+      setPendingLink(null);
+    }
+  };
+
   return (
     <div className="border-b border-neutral-900 pb-4">
       <motion.h2
@@ -21,7 +44,12 @@ const Projects = () => {
               transition={{ duration: 1 }}
               className="w-full lg:w-1/4"
             >
-              <a href={project.link} target="_blank" rel="noopener noreferrer">
+              <a
+                href={isLoggedIn ? project.link : "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => handleProjectClick(e, project.link)}
+              >
                 <img
                   src={project.image}
                   width={150}
@@ -50,6 +78,20 @@ const Projects = () => {
             </motion.div>
           </div>
         ))}
+        {showLogin && !isLoggedIn && (
+          <div className="mt-4 flex justify-center">
+            <GoogleLogin
+              onSuccess={handleLoginSuccess}
+              onError={() => alert("Google Login Failed")}
+            />
+            <button
+              className="ml-4 text-xs text-gray-400 hover:underline"
+              onClick={() => setShowLogin(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
