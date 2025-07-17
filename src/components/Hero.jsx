@@ -1,6 +1,9 @@
 import { HERO_CONTENT } from "../constants";
 import profilePic from "../assets/images/fab-profile_web.jpg";
-import { motion } from "motion/react";
+import resume from "../assets/files/KalvandaFabrice__Resume.pdf";
+import { motion } from "framer-motion"; // fix import
+import { useState } from "react";
+import { GoogleLogin } from "@react-oauth/google";
 
 const container = (delay) => ({
   hidden: { x: -100, opacity: 0 },
@@ -12,6 +15,23 @@ const container = (delay) => ({
 });
 
 const Hero = () => {
+  const [showLogin, setShowLogin] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleDownloadClick = (e) => {
+    if (!isLoggedIn) {
+      e.preventDefault();
+      setShowLogin(true);
+    }
+  };
+
+  const handleLoginSuccess = () => {
+    setIsLoggedIn(true);
+    setShowLogin(false);
+    // Optionally trigger download after login
+    window.open(resume, "_blank");
+  };
+
   return (
     <div className="border-b border-neutral-900 pb-4 lg:mb-35">
       <div className="flex flex-wrap">
@@ -41,6 +61,33 @@ const Hero = () => {
             >
               {HERO_CONTENT}
             </motion.p>
+            <motion.a
+              variants={container(1.5)}
+              initial="hidden"
+              animate="visible"
+              href={isLoggedIn ? resume : "#"}
+              download={isLoggedIn ? "resume" : undefined}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-block mt-6 rounded bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow hover:bg-indigo-500 transition-colors"
+              onClick={handleDownloadClick}
+            >
+              Download Resume
+            </motion.a>
+            {showLogin && !isLoggedIn && (
+              <div className="mt-4">
+                <GoogleLogin
+                  onSuccess={handleLoginSuccess}
+                  onError={() => alert("Google Login Failed")}
+                />
+                <button
+                  className="block mt-2 text-xs text-gray-400 hover:underline"
+                  onClick={() => setShowLogin(false)}
+                >
+                  Cancel
+                </button>
+              </div>
+            )}
           </div>
         </div>
         <div className="w-full lg:w-1/2 lg:p-8">
